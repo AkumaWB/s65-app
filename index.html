@@ -1,0 +1,39 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Series 65</title><meta name="robots" content="noindex,nofollow">
+<link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Series 65"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="theme-color" content="#1F3A93">
+<style>
+:root{--bg:#F4F6F8;--card:#fff;--ink:#18222E;--mut:#5B6B7C;--line:#DCE3EA;--acc:#1F3A93;--gold:#E9B90C}
+@media (prefers-color-scheme:dark){:root{--bg:#0F151C;--card:#18202A;--ink:#E7EDF3;--mut:#92A2B3;--line:#28333F;--acc:#7C9BFF;color-scheme:dark}}
+*{box-sizing:border-box}html,body{height:100%}body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:520px;margin:0 auto;padding-block:max(28px,env(safe-area-inset-top,0px)) 60px;padding-left:max(18px,env(safe-area-inset-left,0px));padding-right:max(18px,env(safe-area-inset-right,0px))}
+.logo{width:84px;height:84px;border-radius:19px;background:#1F3A93;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;font-weight:800;margin:10px 0 14px}
+.logo small{font-size:10px;letter-spacing:.14em;color:var(--gold)}.logo b{font-size:40px;line-height:1}
+h1{font-size:28px;margin:0 0 4px}p{color:var(--mut);margin:0 0 18px}
+.btn{display:flex;justify-content:space-between;align-items:center;width:100%;text-align:left;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:14px;padding:16px 18px;font:inherit;font-weight:700;font-size:1.05rem;cursor:pointer;margin:10px 0}
+.btn small{display:block;font-weight:500;color:var(--mut);font-size:.82rem}.btn.p{background:var(--acc);color:#fff;border-color:var(--acc)}.btn.p small{color:#fff;opacity:.85}
+input{width:100%;font:inherit;font-size:1.1rem;padding:14px;border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);margin:6px 0 10px}
+.err{color:#B23B2E;font-weight:600;min-height:1.4em}.st{color:var(--mut);font-size:.85rem;margin-top:22px}[hidden]{display:none!important}
+</style></head><body><div class="wrap">
+<div class="logo"><small>SERIES</small><b>65</b></div>
+<div id="lock"><h1>Series 65</h1><p>Enter the passcode once. The app then opens straight to the pages, online or offline.</p>
+<form id="f"><input id="pc" type="password" autocomplete="current-password" placeholder="Passcode" autocapitalize="none"><button class="btn p" type="submit"><span>Unlock<small>Checked on this device only</small></span><span>›</span></button></form><div class="err" id="err"></div></div>
+<div id="menu" hidden><h1>Series 65</h1><p>Kaplan 12E, closed loop. Exam Wednesday 4 November, New York.</p>
+<button class="btn p" onclick="openPage('drill')"><span>Drill<small>576 questions by unit and area · 130-question timed mock · re-drill misses</small></span><span>›</span></button>
+<button class="btn" onclick="openPage('study')"><span>Study page<small>All 24 units: trees, number ledgers, registers, traps, errata</small></span><span>›</span></button>
+<button class="btn" onclick="openPage('crash')"><span>Crash review<small>Last 72 hours: plan, numbers, formulas, traps, errata</small></span><span>›</span></button>
+<div class="st" id="st"></div></div>
+</div>
+<script>
+const ITER=150000;const enc=new TextEncoder();
+function b64(s){const b=atob(s);const a=new Uint8Array(b.length);for(let i=0;i<b.length;i++)a[i]=b.charCodeAt(i);return a}
+async function keyFor(pass,salt){const km=await crypto.subtle.importKey('raw',enc.encode(pass),'PBKDF2',false,['deriveKey']);return crypto.subtle.deriveKey({name:'PBKDF2',salt,iterations:ITER,hash:'SHA-256'},km,{name:'AES-GCM',length:256},false,['decrypt'])}
+async function decrypt(name,pass){const r=await fetch(name+'.enc');const j=await r.json();const key=await keyFor(pass,b64(j.salt));const pt=await crypto.subtle.decrypt({name:'AES-GCM',iv:b64(j.iv)},key,b64(j.ct));return new TextDecoder().decode(pt)}
+function getPass(){try{return localStorage.getItem('s65-pass')}catch(e){return null}}
+function show(){const p=getPass();document.getElementById('lock').hidden=!!p;document.getElementById('menu').hidden=!p;}
+document.getElementById('f').onsubmit=async e=>{e.preventDefault();const p=document.getElementById('pc').value.trim();const err=document.getElementById('err');err.textContent='Checking…';
+ try{await decrypt('crash',p);try{localStorage.setItem('s65-pass',p)}catch(x){};err.textContent='';show();}catch(x){err.textContent='That passcode did not unlock the pages.';}};
+async function openPage(name){const st=document.getElementById('st');st.textContent='Opening…';try{const html=await decrypt(name,getPass());document.open();document.write(html);document.close();}catch(x){st.textContent='Could not open. If you are offline, open each page once while online so it is stored.';}}
+if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').then(()=>{const st=document.getElementById('st');if(st)st.textContent='Stored for offline use. Version 2026-10-15a.'}).catch(()=>{});}
+show();
+</script></body></html>
