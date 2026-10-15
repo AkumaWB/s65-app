@@ -34,6 +34,6 @@ function show(){const p=getPass();document.getElementById('lock').hidden=!!p;doc
 document.getElementById('f').onsubmit=async e=>{e.preventDefault();const p=document.getElementById('pc').value.trim();const err=document.getElementById('err');err.textContent='Checking…';
  try{await decrypt('crash',p);try{localStorage.setItem('s65-pass',p)}catch(x){};err.textContent='';show();}catch(x){err.textContent='That passcode did not unlock the pages.';}};
 async function openPage(name){const st=document.getElementById('st');st.textContent='Opening…';try{const html=await decrypt(name,getPass());document.open();document.write(html);document.close();}catch(x){st.textContent='Could not open. If you are offline, open each page once while online so it is stored.';}}
-if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').then(()=>{const st=document.getElementById('st');if(st)st.textContent='Stored for offline use. Version 2026-10-15a.'}).catch(()=>{});}
+if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').then(()=>{const st=document.getElementById('st');if(st)st.textContent='Stored for offline use. Version 2026-10-15b.'}).catch(()=>{});}
 show();
 </script></body></html>
